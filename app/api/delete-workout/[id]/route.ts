@@ -8,7 +8,7 @@ export async function DELETE(
 	try {
 		await prisma.workout.delete({ where: { id: Number(params.id) } });
 		return NextResponse.json({ message: 'Workout deleted successfully.' });
-	} catch (error) {
+	} catch {
 		return NextResponse.json(
 			{ error: 'Failed to delete workout.' },
 			{ status: 500 },

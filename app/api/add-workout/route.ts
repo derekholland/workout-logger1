@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 			},
 		});
 		return NextResponse.json(newWorkout);
-	} catch (error) {
+	} catch {
 		return NextResponse.json(
 			{ error: 'Failed to create workout.' },
 			{ status: 500 },

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Link } from 'react-router-dom';
 
 interface Set {
 	id?: number;
