@@ -7,7 +7,7 @@ const Navbar = () => {
 		<nav className='bg-gray-800 p-4'>
 			<div className='container mx-auto flex justify-between items-center'>
 				<div className='text-white text-2xl font-bold'>
-					<Link href='/'>MyLogo</Link>
+					<Link href='/'>Workout Logger</Link>
 				</div>
 				<div className='hidden md:flex space-x-4'>
 					<Link
