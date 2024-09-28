@@ -24,7 +24,6 @@ const LogWorkout: React.FC = () => {
 	const [selectedExercise, setSelectedExercise] = useState<string>(''); // State for selected exercise
 	const [workingWeight, setWorkingWeight] = useState<number | null>(null); // State for working weight
 	const [sets, setSets] = useState<Set[]>([]); // State to store sets including warm-up and working set
-	const [reps, setReps] = useState<number>(5); // Default reps for working set
 	const [workout, setWorkout] = useState<Workout>({
 		date: new Date().toISOString().split('T')[0],
 		exercises: [],
@@ -36,7 +35,7 @@ const LogWorkout: React.FC = () => {
 	const calculateWarmupSets = (weight: number) => {
 		const percentages = [0.6, 0.7, 0.8, 0.9, 1.0]; // 60%, 70%, 80%, 90%, 100%
 		const warmup = percentages.map(percent => ({
-			reps: percent === 1 ? reps : 5, // Fewer reps for warm-up sets
+			reps: percent === 1 ? 5 : Math.floor(5 / 2), // Fewer reps for warm-up sets (default 5 for working set)
 			weight: Math.round(weight * percent), // Calculate weight for each percentage
 		}));
 		setSets(warmup);
