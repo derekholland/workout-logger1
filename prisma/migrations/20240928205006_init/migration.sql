@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE `Workout` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(191) NOT NULL,
     `date` DATETIME(3) NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -19,7 +20,7 @@ CREATE TABLE `Exercise` (
 CREATE TABLE `Set` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `reps` INTEGER NOT NULL,
-    `weight` INTEGER NOT NULL,
+    `weight` DOUBLE NOT NULL,
     `exerciseId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
