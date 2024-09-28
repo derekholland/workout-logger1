@@ -19,7 +19,14 @@ interface Workout {
 	exercises: Exercise[];
 }
 
-const exerciseOptions = ['Bench Press', 'Squat', 'Deadlift', 'Overhead Press'];
+const exerciseOptions = [
+	'Squat',
+	'Bench Press',
+	'Deadlift',
+	'Overhead Press',
+	'Chin-Ups',
+	'Skull Crushers',
+];
 
 const LogWorkout: React.FC = () => {
 	const [selectedExercise, setSelectedExercise] = useState<string>(''); // State for selected exercise
@@ -37,7 +44,7 @@ const LogWorkout: React.FC = () => {
 	const calculateWarmupSets = (weight: number) => {
 		const percentages = [0.6, 0.7, 0.8, 0.9, 1.0]; // 60%, 70%, 80%, 90%, 100%
 		const warmup = percentages.map(percent => ({
-			reps: percent === 1 ? 5 : Math.floor(5 / 2), // Fewer reps for warm-up sets (default 5 for working set)
+			reps: 5,
 			weight: Math.round(weight * percent), // Calculate weight for each percentage
 		}));
 		setSets(warmup);

@@ -13,24 +13,47 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// model Workout {
+//   id        Int        @id @default(autoincrement())
+//   date      DateTime
+//   exercises Exercise[] // One-to-many relation with Exercise
+// }
+
+// model Exercise {
+//   id        Int     @id @default(autoincrement())
+//   name      String
+//   workoutId Int // Foreign key linking Exercise to Workout
+//   workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade) // Define relation to Workout
+//   sets      Set[] // One-to-many relation with Set
+// }
+
+// model Set {
+//   id         Int      @id @default(autoincrement())
+//   reps       Int
+//   weight     Int
+//   exerciseId Int // Foreign key linking Set to Exercise
+//   exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade) // Define relation to Exercise
+// }
+
 model Workout {
   id        Int        @id @default(autoincrement())
-  date      DateTime
-  exercises Exercise[] // One-to-many relation with Exercise
+  title     String // Workout title
+  date      DateTime // Workout date
+  exercises Exercise[] // Relation to exercises
 }
 
 model Exercise {
   id        Int     @id @default(autoincrement())
-  name      String
-  workoutId Int // Foreign key linking Exercise to Workout
-  workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade) // Define relation to Workout
-  sets      Set[] // One-to-many relation with Set
+  name      String // Exercise name
+  workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade)
+  workoutId Int // Foreign key to Workout
+  sets      Set[] // Relation to sets
 }
 
 model Set {
   id         Int      @id @default(autoincrement())
-  reps       Int
-  weight     Int
-  exerciseId Int // Foreign key linking Set to Exercise
-  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade) // Define relation to Exercise
+  reps       Int // Number of reps
+  weight     Float // Weight used
+  exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade)
+  exerciseId Int // Foreign key to Exercise
 }

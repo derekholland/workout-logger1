@@ -1,42 +1,37 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '../../lib/prisma'; // Prisma Client
+import { prisma } from '../../lib/prisma'; // Adjust the import path to match your prisma setup
 
-interface Set {
-	reps: number;
-	weight: number;
-}
-
-interface Exercise {
-	name: string;
-	sets: Set[];
-}
-
-interface Workout {
-	date: string;
-	exercises: Exercise[];
-}
-
-export async function POST(req: Request) {
-	const workout: Workout = await req.json(); // Parse JSON request body
-
+export async function POST(request: Request) {
 	try {
+		const body = await request.json(); // Parse incoming workout data
+
+		// Save the workout to the database
 		const newWorkout = await prisma.workout.create({
 			data: {
-				date: new Date(workout.date),
+				title: body.title,
+				date: new Date(body.date),
 				exercises: {
-					create: workout.exercises.map(exercise => ({
+					create: body.exercises.map((exercise: any) => ({
 						name: exercise.name,
 						sets: {
-							create: exercise.sets, // Create associated sets for each exercise
+							create: exercise.sets.map((set: any) => ({
+								reps: set.reps,
+								weight: set.weight,
+							})),
 						},
 					})),
 				},
 			},
 		});
-		return NextResponse.json(newWorkout);
-	} catch {
+
+		return NextResponse.json({
+			message: 'Workout created successfully',
+			workout: newWorkout,
+		});
+	} catch (error) {
+		console.error('Error creating workout:', error);
 		return NextResponse.json(
-			{ error: 'Failed to create workout.' },
+			{ error: 'Failed to create workout' },
 			{ status: 500 },
 		);
 	}
