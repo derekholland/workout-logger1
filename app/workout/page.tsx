@@ -14,6 +14,7 @@ interface Exercise {
 }
 
 interface Workout {
+	title: string;
 	date: string;
 	exercises: Exercise[];
 }
@@ -25,6 +26,7 @@ const LogWorkout: React.FC = () => {
 	const [workingWeight, setWorkingWeight] = useState<number | null>(null); // State for working weight
 	const [sets, setSets] = useState<Set[]>([]); // State to store sets including warm-up and working set
 	const [workout, setWorkout] = useState<Workout>({
+		title: '', // New state for the workout title
 		date: new Date().toISOString().split('T')[0],
 		exercises: [],
 	}); // State to store the full workout
@@ -106,6 +108,18 @@ const LogWorkout: React.FC = () => {
 	return (
 		<div className='max-w-lg mx-auto p-6 bg-gray-100 min-h-screen'>
 			<h1 className='text-3xl font-bold mb-6 text-center'>Log a New Workout</h1>
+
+			{/* Workout Title Input */}
+			<div className='mb-4'>
+				<label className='block text-lg font-medium mb-2'>Workout Title:</label>
+				<input
+					type='text'
+					value={workout.title}
+					onChange={e => setWorkout({ ...workout, title: e.target.value })}
+					className='w-full p-2 border rounded-lg'
+					placeholder='Enter workout title'
+				/>
+			</div>
 
 			{/* Date Picker */}
 			<div className='mb-4'>
