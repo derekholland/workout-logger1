@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 interface Set {
 	reps: number;
@@ -19,59 +18,89 @@ interface Workout {
 	exercises: Exercise[];
 }
 
-// Log a new workout. Displays when you click add a new workout button
-
-const exerciseOptions = ['Bench Press', 'Squat', 'Deadlift', 'Overhead Press']; // Example exercise options
+const exerciseOptions = ['Bench Press', 'Squat', 'Deadlift', 'Overhead Press'];
 
 const LogWorkout: React.FC = () => {
+	const [selectedExercise, setSelectedExercise] = useState<string>(''); // State for selected exercise
+	const [workingWeight, setWorkingWeight] = useState<number | null>(null); // State for working weight
+	const [sets, setSets] = useState<Set[]>([]); // State to store sets including warm-up and working set
+	const [reps, setReps] = useState<number>(5); // Default reps for working set
 	const [workout, setWorkout] = useState<Workout>({
 		date: new Date().toISOString().split('T')[0],
 		exercises: [],
-	});
-	const [selectedExercise, setSelectedExercise] = useState<string>(''); // State for selected exercise
-	const [reps, setReps] = useState<number>(0); // State for reps input
-	const [weight, setWeight] = useState<number>(0); // State for weight input
-	const [currentSets, setCurrentSets] = useState<Set[]>([]); // State to store the current exercise's sets
+	}); // State to store the full workout
 
-	const router = useRouter();
+	const router = useRouter(); // For navigation after submission
 
-	// Function to handle adding a set to the current exercise
-	const addSet = () => {
-		setCurrentSets([...currentSets, { reps, weight }]);
-		setReps(0);
-		setWeight(0);
+	// Calculate warm-up sets based on the working weight
+	const calculateWarmupSets = (weight: number) => {
+		const percentages = [0.6, 0.7, 0.8, 0.9, 1.0]; // 60%, 70%, 80%, 90%, 100%
+		const warmup = percentages.map(percent => ({
+			reps: percent === 1 ? reps : 5, // Fewer reps for warm-up sets
+			weight: Math.round(weight * percent), // Calculate weight for each percentage
+		}));
+		setSets(warmup);
 	};
 
-	// Function to add the current exercise (with its sets) to the workout
+	// Handle changes to individual set weights
+	const handleSetWeightChange = (index: number, newWeight: number) => {
+		const updatedSets = [...sets];
+		updatedSets[index].weight = newWeight;
+		setSets(updatedSets);
+	};
+
+	// Handle changes to individual set reps
+	const handleSetRepsChange = (index: number, newReps: number) => {
+		const updatedSets = [...sets];
+		updatedSets[index].reps = newReps;
+		setSets(updatedSets);
+	};
+
+	// Handle working weight submission
+	const handleWorkingWeightSubmit = () => {
+		if (workingWeight) {
+			calculateWarmupSets(workingWeight);
+		}
+	};
+
+	// Add the current exercise and its sets to the workout
 	const addExerciseToWorkout = () => {
-		const newExercise: Exercise = { name: selectedExercise, sets: currentSets };
-		setWorkout({ ...workout, exercises: [...workout.exercises, newExercise] });
-		setSelectedExercise(''); // Reset for the next exercise
-		setCurrentSets([]); // Clear the sets for the next exercise
+		if (selectedExercise && sets.length > 0) {
+			const newExercise: Exercise = {
+				name: selectedExercise,
+				sets: [...sets],
+			};
+			setWorkout({
+				...workout,
+				exercises: [...workout.exercises, newExercise],
+			});
+			// Reset for next exercise
+			setSelectedExercise('');
+			setWorkingWeight(null);
+			setSets([]);
+		}
 	};
 
-	// Function to handle submitting the workout
+	// Submit the workout to the API
 	const submitWorkout = async () => {
 		try {
 			const response = await fetch('/api/add-workout', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				body: JSON.stringify(workout),
 			});
 
 			if (!response.ok) {
-				const errorData = await response.json();
-				throw new Error(errorData.error || 'Failed to log workout');
+				throw new Error('Failed to log workout');
 			}
 
 			alert('Workout logged successfully!');
-			router.push('/'); // Navigate back to home page after submission
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				alert(error.message);
-			} else {
-				alert('An unknown error occurred');
-			}
+			router.push('/'); // Navigate back to the main page
+		} catch (error) {
+			console.error('Error logging workout:', error);
+			alert('An error occurred while logging the workout.');
 		}
 	};
 
@@ -84,7 +113,7 @@ const LogWorkout: React.FC = () => {
 				<label className='block text-lg font-medium mb-2'>Workout Date:</label>
 				<input
 					type='date'
-					value={workout.date.split('T')[0]}
+					value={workout.date}
 					onChange={e => setWorkout({ ...workout, date: e.target.value })}
 					className='w-full p-2 border rounded-lg'
 				/>
@@ -110,56 +139,65 @@ const LogWorkout: React.FC = () => {
 				</select>
 			</div>
 
-			{/* Set Reps and Weight */}
-			<div className='mb-4'>
-				<label className='block text-lg font-medium mb-2'>Reps:</label>
-				<input
-					type='number'
-					value={reps}
-					onChange={e => setReps(Number(e.target.value))}
-					className='w-full p-2 border rounded-lg'
-					placeholder='Enter reps'
-				/>
-			</div>
-
-			<div className='mb-4'>
-				<label className='block text-lg font-medium mb-2'>Weight (lbs):</label>
-				<input
-					type='number'
-					value={weight}
-					onChange={e => setWeight(Number(e.target.value))}
-					className='w-full p-2 border rounded-lg'
-					placeholder='Enter weight'
-				/>
-			</div>
-
-			{/* Add Set Button */}
-			<button
-				onClick={addSet}
-				className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 mb-4'>
-				Add Set
-			</button>
-
-			{/* Display Current Sets */}
-			{currentSets.length > 0 && (
+			{/* Input for Working Weight */}
+			{selectedExercise && (
 				<div className='mb-4'>
-					<h3 className='text-lg font-semibold mb-2'>Current Sets:</h3>
-					<ul className='list-disc pl-5'>
-						{currentSets.map((set, index) => (
-							<li key={index}>
-								{set.reps} reps @ {set.weight} lbs
+					<label className='block text-lg font-medium mb-2'>
+						Working Weight (lbs):
+					</label>
+					<input
+						type='number'
+						value={workingWeight || ''}
+						onChange={e => setWorkingWeight(Number(e.target.value))}
+						className='w-full p-2 border rounded-lg'
+						placeholder='Enter working weight'
+					/>
+					<button
+						onClick={handleWorkingWeightSubmit}
+						className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 mt-4'>
+						Calculate Warm-Up Sets
+					</button>
+				</div>
+			)}
+
+			{/* Display and Edit Warm-Up Sets */}
+			{sets.length > 0 && (
+				<div className='mt-6'>
+					<h3 className='text-lg font-semibold mb-2'>Warm-Up Sets:</h3>
+					<ul className='space-y-4'>
+						{sets.map((set, index) => (
+							<li key={index} className='flex items-center space-x-4'>
+								<span>Set {index + 1}:</span>
+								<input
+									type='number'
+									value={set.weight}
+									onChange={e =>
+										handleSetWeightChange(index, Number(e.target.value))
+									}
+									className='w-24 p-2 border rounded-lg'
+								/>
+								<span>Weight</span>
+								<input
+									type='number'
+									value={set.reps}
+									onChange={e =>
+										handleSetRepsChange(index, Number(e.target.value))
+									}
+									className='w-24 p-2 border rounded-lg'
+								/>
+								<span>Reps</span>
 							</li>
 						))}
 					</ul>
 				</div>
 			)}
 
-			{/* Add Exercise or Finish Workout */}
-			<div className='flex space-x-4'>
+			{/* Add Exercise and Finish Workout */}
+			<div className='flex space-x-4 mt-6'>
 				<button
 					onClick={addExerciseToWorkout}
 					className='w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700'
-					disabled={!selectedExercise || currentSets.length === 0}>
+					disabled={!selectedExercise || sets.length === 0}>
 					Add Exercise
 				</button>
 				<button
@@ -169,11 +207,8 @@ const LogWorkout: React.FC = () => {
 					Finish Workout
 				</button>
 			</div>
-			<div className='mt-10'>
-				<Link href='/'>Home</Link>
-			</div>
 
-			{/* Display Current Workout */}
+			{/* Display the added exercises */}
 			{workout.exercises.length > 0 && (
 				<div className='mt-6'>
 					<h3 className='text-lg font-semibold mb-2'>Current Workout:</h3>
