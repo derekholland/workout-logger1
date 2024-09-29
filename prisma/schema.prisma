@@ -13,28 +13,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model Workout {
-//   id        Int        @id @default(autoincrement())
-//   date      DateTime
-//   exercises Exercise[] // One-to-many relation with Exercise
-// }
-
-// model Exercise {
-//   id        Int     @id @default(autoincrement())
-//   name      String
-//   workoutId Int // Foreign key linking Exercise to Workout
-//   workout   Workout @relation(fields: [workoutId], references: [id], onDelete: Cascade) // Define relation to Workout
-//   sets      Set[] // One-to-many relation with Set
-// }
-
-// model Set {
-//   id         Int      @id @default(autoincrement())
-//   reps       Int
-//   weight     Int
-//   exerciseId Int // Foreign key linking Set to Exercise
-//   exercise   Exercise @relation(fields: [exerciseId], references: [id], onDelete: Cascade) // Define relation to Exercise
-// }
-
 model Workout {
   id        Int        @id @default(autoincrement())
   title     String // Workout title
