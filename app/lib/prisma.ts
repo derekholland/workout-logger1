@@ -15,21 +15,22 @@
 
 import { PrismaClient } from '@prisma/client';
 
-// Add PrismaClient as a global variable in development to avoid instantiating it multiple times
+let prisma: PrismaClient;
+
+// Add a type declaration for `globalThis`
 declare global {
+	// eslint-disable-next-line no-var
 	var prisma: PrismaClient | undefined;
 }
 
-// Initialize PrismaClient and ensure it uses the production database
-export const prisma =
-	global.prisma ||
-	new PrismaClient({
-		datasources: {
-			db: {
-				url: process.env.DATABASE_URL, // Ensures Prisma uses the production URL
-			},
-		},
-	});
+// Initialize PrismaClient and prevent multiple instances in development
+if (process.env.NODE_ENV === 'production') {
+	prisma = new PrismaClient(); // In production, just create a new instance
+} else {
+	if (!global.prisma) {
+		global.prisma = new PrismaClient(); // In development, attach to global object
+	}
+	prisma = global.prisma; // Reuse the same instance
+}
 
-// Prevent multiple PrismaClient instances in development
-if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
+export { prisma };
