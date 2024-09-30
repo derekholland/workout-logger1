@@ -40,11 +40,15 @@ const Home = () => {
 				throw new Error(errorData.error || 'Failed to fetch workouts.');
 			}
 			const data: Workout[] = await response.json(); // Parse the JSON data
-			setWorkouts(data); // Update the workouts state with fetched data
-		} catch (err: any) {
-			setError(err.message || 'An unexpected error occurred.');
+			setWorkouts(data);
+		} catch (err: unknown) {
+			if (err instanceof Error) {
+				setError(err.message || 'An unexpected error occurred.');
+			} else {
+				setError('An unknown error occurred.');
+			}
 		} finally {
-			setLoading(false); // Set loading to false regardless of success or failure
+			setLoading(false);
 		}
 	};
 
