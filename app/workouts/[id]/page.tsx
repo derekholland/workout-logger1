@@ -48,10 +48,10 @@ const WorkoutDetail: React.FC = () => {
 	if (error) return <p className='text-red-500'>{error}</p>;
 
 	return (
-		<div className='max-w-2xl mx-auto p-6 bg-gray-100 min-h-screen mb-10'>
+		<div className='max-w-2xl mx-auto p-6  min-h-screen'>
 			{workout ? (
 				<>
-					<h1 className='text-3xl font-bold mb-4'>
+					<h1 className='text-3xl dark:text-secondary-dark font-bold mb-4'>
 						Workout on {new Date(workout.date).toLocaleString()}
 					</h1>
 

@@ -1,7 +1,14 @@
-'use client'; // Enables client-side rendering for this component
+'use client';
 
-import React, { useEffect, useState } from 'react'; // Import React and hooks
-import Link from 'next/link'; // Import Link component for client-side navigation
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardContent,
+	CardFooter,
+} from '../components/ui/card';
 
 // Define the structure of a workout as received from the API
 interface Set {
@@ -24,22 +31,18 @@ interface Workout {
 }
 
 const Home = () => {
-	const [workouts, setWorkouts] = useState<Workout[]>([]); // State to hold the list of workouts
-	const [loading, setLoading] = useState<boolean>(true); // State to manage loading status
-	const [error, setError] = useState<string | null>(null); // State to manage error messages
+	const [workouts, setWorkouts] = useState<Workout[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [error, setError] = useState<string | null>(null);
 
-	/**
-	 * fetchWorkouts
-	 * Asynchronously fetches the list of workouts from the API.
-	 */
 	const fetchWorkouts = async () => {
 		try {
-			const response = await fetch('/api/get-workouts'); // Fetch data from the API
+			const response = await fetch('/api/get-workouts');
 			if (!response.ok) {
 				const errorData = await response.json();
 				throw new Error(errorData.error || 'Failed to fetch workouts.');
 			}
-			const data: Workout[] = await response.json(); // Parse the JSON data
+			const data: Workout[] = await response.json();
 			setWorkouts(data);
 		} catch (err: unknown) {
 			if (err instanceof Error) {
@@ -53,70 +56,83 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		fetchWorkouts(); // Invoke the fetchWorkouts function when the component mounts
-	}, []); // Empty dependency array ensures this runs only once on mount
+		fetchWorkouts();
+	}, []);
 
 	return (
-		<div className='max-w-2xl mx-auto p-6 bg-gray-100 min-h-screen'>
-			<h1 className='text-3xl font-bold mb-6 text-center'>Your Workouts</h1>
+		<div className='max-w-2xl mx-auto p-6 min-h-screen transition-colors duration-300'>
+			<h1 className='text-3xl font-bold mb-6 text-center text-gray-800 dark:text-slate-100'>
+				Your Workouts
+			</h1>
 
-			{/* Link to the Log Workout page */}
+			{/* Log Workout Button */}
 			<div className='mb-6 text-center'>
 				<Link
 					href='/workout'
-					className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700'>
+					className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'>
 					Log a New Workout
 				</Link>
 			</div>
 
-			{/* Display loading state */}
-			{loading && <p>Loading workouts...</p>}
-
-			{/* Display error message if any */}
+			{/* Loading and Error States */}
+			{loading && (
+				<p className='text-gray-700 dark:text-gray-300'>Loading workouts...</p>
+			)}
 			{error && <p className='text-red-500'>{error}</p>}
 
-			{/* Display message if no workouts are logged */}
 			{!loading && !error && workouts.length === 0 && (
-				<p>No workouts logged yet.</p>
+				<p className='text-gray-700 dark:text-gray-300'>
+					No workouts logged yet.
+				</p>
 			)}
 
-			{/* Display list of workouts if available */}
+			{/* List of Workouts */}
 			{!loading && !error && workouts.length > 0 && (
-				<ul className='space-y-4'>
+				<div className='space-y-4'>
 					{workouts.map(workout => (
-						<li key={workout.id} className='p-4 bg-white rounded-lg shadow'>
-							<Link href={`/workouts/${workout.id}`} className='block'>
-								<h2 className='font-medium'>{workout.title}</h2>
-								<h3>{new Date(workout.date).toLocaleDateString()}</h3>
-
-								{/* Iterate through each exercise in the workout */}
-								<ul>
+						<Card
+							key={workout.id}
+							className='bg-white dark:bg-primary-dark shadow-md rounded-lg transition-colors duration-300'>
+							<CardHeader>
+								<CardTitle className='text-lg font-medium text-gray-900 dark:text-white'>
+									<div>{workout.title}</div>
+									{new Date(workout.date).toLocaleDateString()}
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								<div>
 									{workout.exercises.map(exercise => {
-										// Get the final (working) set for the exercise
 										const finalSet = exercise.sets.slice(-1)[0];
-
 										return (
-											<li key={exercise.id} className='mt-2'>
-												{/* <p className='font-semibold'>{exercise.name}</p> */}
-
+											<div key={exercise.id} className='mt-2'>
+												<p className='font-semibold text-gray-800 dark:text-gray-200'>
+													{exercise.name}
+												</p>
 												{finalSet ? (
-													<p className='text-sm text-gray-600'>
-														{exercise.name} {finalSet.reps} reps X{' '}
-														{finalSet.weight} lbs
+													<p className='text-sm text-gray-600 dark:text-gray-400'>
+														Final Set: {finalSet.reps} reps @ {finalSet.weight}{' '}
+														lbs
 													</p>
 												) : (
-													<p className='text-sm text-gray-600'>
+													<p className='text-sm text-gray-600 dark:text-gray-400'>
 														No sets logged
 													</p>
 												)}
-											</li>
+											</div>
 										);
 									})}
-								</ul>
-							</Link>
-						</li>
+								</div>
+							</CardContent>
+							<CardFooter className='text-right'>
+								<Link
+									href={`/workouts/${workout.id}`}
+									className='text-blue-600 dark:text-blue-400 hover:underline'>
+									View Details
+								</Link>
+							</CardFooter>
+						</Card>
 					))}
-				</ul>
+				</div>
 			)}
 		</div>
 	);

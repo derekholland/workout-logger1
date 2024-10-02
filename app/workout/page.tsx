@@ -113,7 +113,7 @@ const LogWorkout: React.FC = () => {
 	};
 
 	return (
-		<div className='max-w-lg mx-auto p-6 bg-gray-100 min-h-screen'>
+		<div className='max-w-lg mx-auto p-6 bg-gray-100 min-h-screen mb-10'>
 			<h1 className='text-3xl font-bold mb-6 text-center'>Log a New Workout</h1>
 
 			{/* Workout Title Input */}
