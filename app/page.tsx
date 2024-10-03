@@ -9,6 +9,7 @@ import {
 	CardContent,
 	CardFooter,
 } from '../components/ui/card';
+import { Button } from '@/components/ui/button';
 
 // Define the structure of a workout as received from the API
 interface Set {
@@ -70,7 +71,7 @@ const Home = () => {
 				<Link
 					href='/workout'
 					className='px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'>
-					Log a New Workout
+					<Button>Log a New Workout</Button>
 				</Link>
 			</div>
 

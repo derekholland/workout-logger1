@@ -2,8 +2,10 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Link from 'next/link'; // Import Link for navigation
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import Link from 'next/link';
 
+// Define the structure of a workout, exercise, and set
 interface Set {
 	reps: number;
 	weight: number;
@@ -16,26 +18,28 @@ interface Exercise {
 
 interface Workout {
 	id: number;
+	title: string;
 	date: string;
 	exercises: Exercise[];
 }
 
-const WorkoutDetail: React.FC = () => {
-	const { id } = useParams(); // Get the workout ID from the URL
-	const [workout, setWorkout] = useState<Workout | null>(null); // State to hold the workout data
-	const [loading, setLoading] = useState<boolean>(true); // Loading state
-	const [error, setError] = useState<string | null>(null); // Error state
+const WorkoutDetail = () => {
+	const { id } = useParams(); // Extract the workout ID from the URL
+	const [workout, setWorkout] = useState<Workout | null>(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState<string | null>(null);
 
-	// Fetch workout details by ID
 	useEffect(() => {
 		const fetchWorkout = async () => {
 			try {
-				const response = await fetch(`/api/get-workout/${id}`); // Fetch the workout by ID
-				if (!response.ok) throw new Error('Failed to fetch workout');
+				const response = await fetch(`/api/get-workout/${id}`);
+				if (!response.ok) {
+					throw new Error('Failed to fetch workout details');
+				}
 				const data: Workout = await response.json();
 				setWorkout(data);
-			} catch (error: unknown) {
-				setError((error as Error).message);
+			} catch (err: unknown) {
+				setError('An error occurred while fetching the workout details');
 			} finally {
 				setLoading(false);
 			}
@@ -44,44 +48,51 @@ const WorkoutDetail: React.FC = () => {
 		fetchWorkout();
 	}, [id]);
 
-	if (loading) return <p>Loading workout...</p>;
-	if (error) return <p className='text-red-500'>{error}</p>;
+	if (loading) {
+		return <p>Loading workout details...</p>;
+	}
+
+	if (error) {
+		return <p className='text-red-500'>{error}</p>;
+	}
+
+	if (!workout) {
+		return <p>No workout found.</p>;
+	}
 
 	return (
-		<div className='max-w-2xl mx-auto p-6  min-h-screen'>
-			{workout ? (
-				<>
-					<h1 className='text-3xl dark:text-secondary-dark font-bold mb-4'>
-						Workout on {new Date(workout.date).toLocaleString()}
-					</h1>
+		<Card className='max-w-2xl mx-auto mt-10 bg-white dark:bg-gray-800 shadow-md rounded-lg'>
+			<CardHeader>
+				<CardTitle className='text-lg font-medium text-gray-900 dark:text-white'>
+					Workout: {workout.title}
+				</CardTitle>
+				<p className='text-gray-600 dark:text-gray-400'>
+					Date: {new Date(workout.date).toLocaleDateString()}
+				</p>
+			</CardHeader>
 
-					<h2 className='text-2xl font-semibold mb-2'>Exercises</h2>
-					<ul className='space-y-4'>
-						{workout.exercises.map((exercise, index) => (
-							<li key={index} className='bg-white p-4 rounded-lg shadow'>
-								<h3 className='text-xl font-medium mb-2'>{exercise.name}</h3>
-								<ul className='space-y-2'>
-									{exercise.sets.map((set, setIndex) => (
-										<li key={setIndex}>
-											{set.reps} reps @ {set.weight} lbs
-										</li>
-									))}
-								</ul>
-							</li>
-						))}
-					</ul>
-
-					{/* Add a link to the Edit Workout page */}
-					<Link
-						href={`/update-workout/${id}`}
-						className='block mt-4 text-blue-600'>
-						Edit Workout
-					</Link>
-				</>
-			) : (
-				<p>No workout found.</p>
-			)}
-		</div>
+			<CardContent>
+				{workout.exercises.map((exercise, index) => (
+					<div key={index} className='mb-6'>
+						<h3 className='text-md font-semibold text-gray-800 dark:text-gray-300'>
+							{exercise.name}
+						</h3>
+						<ul className='ml-4'>
+							{exercise.sets.map((set, setIndex) => (
+								<li key={setIndex} className='text-gray-700 dark:text-gray-400'>
+									Set {setIndex + 1}: {set.reps} reps @ {set.weight} lbs
+								</li>
+							))}
+						</ul>
+					</div>
+				))}
+				<Link
+					href={`/update-workout/${id}`}
+					className='block mt-4 text-blue-600'>
+					Edit Workout
+				</Link>
+			</CardContent>
+		</Card>
 	);
 };
 

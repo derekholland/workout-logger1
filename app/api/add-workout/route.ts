@@ -23,6 +23,8 @@ export async function POST(request: Request) {
 		// Parse the incoming request data and type it as WorkoutData
 		const body: WorkoutData = await request.json();
 
+		console.log('Received data from form:', JSON.stringify(body, null, 2));
+
 		// Create a new workout entry in the database using Prisma
 		const newWorkout = await prisma.workout.create({
 			data: {
