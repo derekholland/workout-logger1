@@ -1,16 +1,45 @@
+// import { NextResponse } from 'next/server';
+// import { prisma } from '../../../lib/prisma';
+
+// export async function DELETE(
+// 	req: Request,
+// 	{ params }: { params: { id: string } },
+// ) {
+// 	try {
+// 		await prisma.workout.delete({ where: { id: Number(params.id) } });
+// 		return NextResponse.json({ message: 'Workout deleted successfully.' });
+// 	} catch {
+// 		return NextResponse.json(
+// 			{ error: 'Failed to delete workout.' },
+// 			{ status: 500 },
+// 		);
+// 	}
+// }
+
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 
 export async function DELETE(
-	req: Request,
+	request: Request,
 	{ params }: { params: { id: string } },
 ) {
 	try {
-		await prisma.workout.delete({ where: { id: Number(params.id) } });
-		return NextResponse.json({ message: 'Workout deleted successfully.' });
-	} catch {
+		const workoutId = parseInt(params.id);
+
+		await prisma.workout.delete({
+			where: { id: workoutId },
+		});
+
+		// Create the response and disable caching
+		const response = NextResponse.json({
+			message: 'Workout deleted successfully',
+		});
+		response.headers.set('Cache-Control', 'no-store'); // Disable caching to ensure the delete is reflected
+		return response;
+	} catch (error) {
+		console.error('Error deleting workout:', error);
 		return NextResponse.json(
-			{ error: 'Failed to delete workout.' },
+			{ error: 'Failed to delete workout' },
 			{ status: 500 },
 		);
 	}

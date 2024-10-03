@@ -105,7 +105,6 @@ const UpdateWorkout = () => {
 			}
 			// Reload the page after deletion to ensure updated data
 			router.push('/');
-			router.refresh();
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				alert(error.message);

@@ -116,7 +116,6 @@ const WorkoutForm = () => {
 			}
 
 			router.push('/');
-			router.refresh();
 		} catch (error: unknown) {
 			if (error instanceof Error) {
 				alert(error.message);
