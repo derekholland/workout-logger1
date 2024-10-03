@@ -141,8 +141,6 @@
 
 // export default Home;
 
-// app/page.tsx
-
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 // Define the structure of a workout, exercise, and set
@@ -163,25 +161,17 @@ interface Workout {
 	exercises: Exercise[];
 }
 
-// This function runs on the server and fetches the data before rendering the page
-export async function getServerSideProps() {
+// Fetch data on the server side using the new Next.js 13 App Router pattern
+export default async function MainPage() {
 	const response = await fetch(
 		`${process.env.NEXT_PUBLIC_API_URL}/api/get-workouts`,
 		{
-			cache: 'no-store', // Ensure we fetch fresh data on every request
+			cache: 'no-store', // Ensure fresh data on every request
 		},
 	);
 
-	const workouts = await response.json();
+	const workouts: Workout[] = await response.json();
 
-	return {
-		props: {
-			workouts,
-		},
-	};
-}
-
-export default function MainPage({ workouts }: { workouts: Workout[] }) {
 	return (
 		<div className='max-w-2xl mx-auto p-6 bg-gray-100 min-h-screen'>
 			<h1 className='text-3xl font-bold mb-6 text-center'>Your Workouts</h1>
