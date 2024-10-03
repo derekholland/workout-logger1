@@ -47,7 +47,7 @@ const UpdateWorkout = () => {
 				setTitle(data.title);
 				setDate(data.date);
 				setExercises(data.exercises);
-			} catch (err: unknown) {
+			} catch {
 				setError('An error occurred while fetching the workout details');
 			} finally {
 				setLoading(false);
