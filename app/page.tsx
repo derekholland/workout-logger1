@@ -182,7 +182,7 @@ export default function MainPage() {
 
 			const data = await response.json();
 			setWorkouts(data);
-		} catch (err) {
+		} catch {
 			setError('Error loading workouts');
 		} finally {
 			setLoading(false);
