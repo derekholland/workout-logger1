@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 // Define the structure of a workout, exercise, and set
 interface Set {
@@ -82,6 +82,26 @@ const UpdateWorkout = () => {
 
 			if (!response.ok) {
 				throw new Error('Failed to update workout');
+			}
+
+			router.push('/');
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				alert(error.message);
+			} else {
+				alert('An unknown error occurred.');
+			}
+		}
+	};
+
+	const handleDeleteWorkout = async () => {
+		try {
+			const response = await fetch(`/api/delete-workout/${id}`, {
+				method: 'DELETE',
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to delete workout');
 			}
 
 			router.push('/');
@@ -246,10 +266,18 @@ const UpdateWorkout = () => {
 					))}
 
 					{/* Submit Button */}
-					<Button type='submit' className='w-full'>
+					<Button type='submit' className='w-full mb-4'>
 						Update Workout
 					</Button>
 				</form>
+
+				{/* Delete Button */}
+				<Button
+					variant='destructive'
+					onClick={handleDeleteWorkout}
+					className='w-full'>
+					Delete Workout
+				</Button>
 			</CardContent>
 		</Card>
 	);
