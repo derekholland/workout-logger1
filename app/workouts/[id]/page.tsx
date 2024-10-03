@@ -38,7 +38,7 @@ const WorkoutDetail = () => {
 				}
 				const data: Workout = await response.json();
 				setWorkout(data);
-			} catch () {
+			} catch (err: unknown) {
 				setError('An error occurred while fetching the workout details');
 			} finally {
 				setLoading(false);
