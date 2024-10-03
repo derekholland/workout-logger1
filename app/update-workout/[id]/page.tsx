@@ -103,7 +103,8 @@ const UpdateWorkout = () => {
 			if (!response.ok) {
 				throw new Error('Failed to delete workout');
 			}
-
+			// Reload the page after deletion to ensure updated data
+			router.refresh();
 			router.push('/');
 		} catch (error: unknown) {
 			if (error instanceof Error) {
