@@ -124,13 +124,7 @@
 // 									})}
 // 								</div>
 // 							</CardContent>
-// 							<CardFooter className='text-right'>
-// 								<Link
-// 									href={`/workouts/${workout.id}`}
-// 									className='text-blue-600 dark:text-blue-400 hover:underline'>
-// 									View Details
-// 								</Link>
-// 							</CardFooter>
+//
 // 						</Card>
 // 					))}
 // 				</div>
@@ -145,7 +139,14 @@
 
 'use client';
 
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardContent,
+	CardFooter,
+} from '@/components/ui/card';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
 interface Set {
@@ -227,6 +228,14 @@ export default function MainPage() {
 									))}
 								</ul>
 							</CardContent>
+							<CardFooter className='text-right'>
+								{' '}
+								<Link
+									href={`/workouts/${workout.id}`}
+									className='text-blue-600 dark:text-blue-400 hover:underline'>
+									View Details
+								</Link>
+							</CardFooter>
 						</Card>
 					))}
 				</div>
